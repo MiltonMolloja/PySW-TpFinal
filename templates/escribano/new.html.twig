@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Escribano{% endblock %}
+
+{% block body %}
+    <h1>Create new Escribano</h1>
+
+    {{ include('escribano/_form.html.twig') }}
+
+    <a href="{{ path('escribano_index') }}">back to list</a>
+{% endblock %}

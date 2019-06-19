@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Escribano index{% endblock %}
+
+{% block body %}
+    <h1>Escribano index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Matricula</th>
+                <th>Universidad</th>
+                <th>Estado</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for escribano in escribanos %}
+            <tr>
+                <td>{{ escribano.id }}</td>
+                <td>{{ escribano.matricula }}</td>
+                <td>{{ escribano.universidad }}</td>
+                <td>{{ escribano.estado ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('escribano_show', {'id': escribano.id}) }}">show</a>
+                    <a href="{{ path('escribano_edit', {'id': escribano.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('escribano_new') }}">Create new</a>
+{% endblock %}
