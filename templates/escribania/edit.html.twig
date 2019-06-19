@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Escribania{% endblock %}
+
+{% block body %}
+    <h1>Edit Escribania</h1>
+
+    {{ include('escribania/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('escribania_index') }}">back to list</a>
+
+    {{ include('escribania/_delete_form.html.twig') }}
+{% endblock %}

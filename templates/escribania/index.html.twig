@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Escribania index{% endblock %}
+
+{% block body %}
+    <h1>Escribania index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Email</th>
+                <th>Foto</th>
+                <th>Latitud</th>
+                <th>Longitud</th>
+                <th>Estado</th>
+                <th>Nombre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for escribanium in escribanias %}
+            <tr>
+                <td>{{ escribanium.id }}</td>
+                <td>{{ escribanium.direccion }}</td>
+                <td>{{ escribanium.telefono }}</td>
+                <td>{{ escribanium.email }}</td>
+                <td>{{ escribanium.foto }}</td>
+                <td>{{ escribanium.latitud }}</td>
+                <td>{{ escribanium.longitud }}</td>
+                <td>{{ escribanium.estado ? 'Yes' : 'No' }}</td>
+                <td>{{ escribanium.nombre }}</td>
+                <td>
+                    <a href="{{ path('escribania_show', {'id': escribanium.id}) }}">show</a>
+                    <a href="{{ path('escribania_edit', {'id': escribanium.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('escribania_new') }}">Create new</a>
+{% endblock %}
