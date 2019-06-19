@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Novedad index{% endblock %}
+
+{% block body %}
+    <h1>Novedad index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Asunto</th>
+                <th>Mensaje</th>
+                <th>Estado</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for novedad in novedads %}
+            <tr>
+                <td>{{ novedad.id }}</td>
+                <td>{{ novedad.fecha ? novedad.fecha|date('Y-m-d') : '' }}</td>
+                <td>{{ novedad.asunto }}</td>
+                <td>{{ novedad.mensaje }}</td>
+                <td>{{ novedad.estado ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('novedad_show', {'id': novedad.id}) }}">show</a>
+                    <a href="{{ path('novedad_edit', {'id': novedad.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('novedad_new') }}">Create new</a>
+{% endblock %}
