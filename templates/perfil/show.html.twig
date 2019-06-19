@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block body %}
+    <h1>Perfil</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ perfil.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombres</th>
+                <td>{{ perfil.nombres }}</td>
+            </tr>
+            <tr>
+                <th>Apellidos</th>
+                <td>{{ perfil.apellidos }}</td>
+            </tr>
+            <tr>
+                <th>Dni</th>
+                <td>{{ perfil.dni }}</td>
+            </tr>
+            <tr>
+                <th>Fecha_nac</th>
+                <td>{{ perfil.fechaNac ? perfil.fechaNac|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Sexo</th>
+                <td>{{ perfil.sexo }}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{ perfil.estado ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('perfil_index') }}">back to list</a>
+
+    <a href="{{ path('perfil_edit', {'id': perfil.id}) }}">edit</a>
+
+    {{ include('perfil/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Novedad{% endblock %}
+
+{% block body %}
+    <h1>Novedad</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ novedad.id }}</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>{{ novedad.fecha ? novedad.fecha|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Asunto</th>
+                <td>{{ novedad.asunto }}</td>
+            </tr>
+            <tr>
+                <th>Mensaje</th>
+                <td>{{ novedad.mensaje }}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{ novedad.estado ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('novedad_index') }}">back to list</a>
+
+    <a href="{{ path('novedad_edit', {'id': novedad.id}) }}">edit</a>
+
+    {{ include('novedad/_delete_form.html.twig') }}
+{% endblock %}

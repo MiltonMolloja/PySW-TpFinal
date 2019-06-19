@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass="App\Repository\PerfilRepository")
+ */
+class Perfil
+{
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nombres;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $apellidos;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $dni;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNombres(): ?string
+    {
+        return $this->nombres;
+    }
+
+    public function setNombres(string $nombres): self
+    {
+        $this->nombres = $nombres;
+
+        return $this;
+    }
+
+    public function getApellidos(): ?string
+    {
+        return $this->apellidos;
+    }
+
+    public function setApellidos(string $apellidos): self
+    {
+        $this->apellidos = $apellidos;
+
+        return $this;
+    }
+
+    public function getDni(): ?int
+    {
+        return $this->dni;
+    }
+
+    public function setDni(int $dni): self
+    {
+        $this->dni = $dni;
+
+        return $this;
+    }
+}

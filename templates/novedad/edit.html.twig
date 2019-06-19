@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Novedad{% endblock %}
+
+{% block body %}
+    <h1>Edit Novedad</h1>
+
+    {{ include('novedad/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('novedad_index') }}">back to list</a>
+
+    {{ include('novedad/_delete_form.html.twig') }}
+{% endblock %}
