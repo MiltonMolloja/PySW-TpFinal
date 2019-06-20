@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controller;
-
 use App\Entity\Escribano;
 use App\Form\EscribanoType;
 use App\Repository\EscribanoRepository;
@@ -9,7 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+/*AGREGADOs*/
+use Symfony\Component\Serializer\Serializer; 
+use Symfony\Component\Serializer\Encoder\JsonEncoder; 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+/*AGREGADOs*/
 /**
  * @Route("/escribano")
  */
@@ -20,34 +22,47 @@ class EscribanoController extends AbstractController
      */
     public function index(EscribanoRepository $escribanoRepository): Response
     {
-        return $this->render('escribano/index.html.twig', [
-            'escribanos' => $escribanoRepository->findAll(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository('App:Escribano')->findAll();
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        $response = new Response();
+        $response->setContent($serializer->serialize($escribano, 'json'));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
-
     /**
      * @Route("/new", name="escribano_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
     {
-        $escribano = new Escribano();
-        $form = $this->createForm(EscribanoType::class, $escribano);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($escribano);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('escribano_index');
-        }
-
-        return $this->render('escribano/new.html.twig', [
-            'escribano' => $escribano,
-            'form' => $form->createView(),
-        ]);
+         //recupero atributos
+         $data = json_decode($request->getContent(), true);
+         $escribano = new Escribano();
+         $escribano->setMatricula($data['matricula']);        
+         $escribano->setUniversidad($data['universidad']);
+         $escribano->setEstado($data['estado']);
+         
+ 
+         //Se Modifico El controlador para el Alta de Entidad Moneda  Sin Cliente
+         //$em = $this->getDoctrine()->getManager();
+ 
+         $escribaniaArray= $data['escribania'];
+         $idEscribania = $escribaniaArray['id'];
+         $em = $this->getDoctrine()->getManager();
+         $escribania = $em->getRepository("App:Escribania")->find($idEscribania);
+         $escribano->setEscribania($escribania);
+ 
+ 
+         $em->persist($escribano);
+         $em->flush();
+ 
+ 
+         $result['status'] = 'ok';
+         return new Response(json_encode($result), 200);
+ 
     }
-
     /**
      * @Route("/{id}", name="escribano_show", methods={"GET"})
      */
@@ -57,40 +72,45 @@ class EscribanoController extends AbstractController
             'escribano' => $escribano,
         ]);
     }
-
     /**
      * @Route("/{id}/edit", name="escribano_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Escribano $escribano): Response
+    public function edit($id, Request $request): Response
     {
-        $form = $this->createForm(EscribanoType::class, $escribano);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('escribano_index', [
-                'id' => $escribano->getId(),
-            ]);
-        }
-
-        return $this->render('escribano/edit.html.twig', [
-            'escribano' => $escribano,
-            'form' => $form->createView(),
-        ]);
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository('App:Escribano')->find($id);
+        $escribano->setMatricula($data['matricula']);        
+        $escribano->setUniversidad($data['universidad']);
+        $escribano->setEstado($data['estado']);
+        
+        //recupero la entidad empresa de la BD que se corresponde con la id
+        //que se recibe en formato JSON y le asigno a la propiedad empresa de mensaje.
+        $escribaniaArray= $data['escribania'];
+        $idEscribania = $escribaniaArray['id'];
+        //$em = $this->getDoctrine()->getManager();
+        $escribania = $em->getRepository("App:Escribania")->find($idEscribania);
+        $escribano->setEscribania($escribania);
+        
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($escribano);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
-
     /**
      * @Route("/{id}", name="escribano_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Escribano $escribano): Response
+    public function delete($id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$escribano->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($escribano);
-            $entityManager->flush();
+        $em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository('App:Escribano')->find($id);
+        if (!$escribano){
+            throw $this->createNotFoundException('id incorrecta');
         }
-
-        return $this->redirectToRoute('escribano_index');
-    }
+        $em->remove($escribano);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }    
 }
