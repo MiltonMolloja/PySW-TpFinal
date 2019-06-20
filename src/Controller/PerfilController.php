@@ -103,11 +103,12 @@ class PerfilController extends AbstractController
 
         $perfil->setNombres($data['nombres']);
         $perfil->setApellidos($data['apellidos']);
-        $perfil->setDni($data['dni']);
-        $perfil->setSexo($data['sexo']);
-        $perfil->setEstado($data['estado']);                
+        //$perfil->setDni($data['dni']);
         $fecha = new \DateTime($data['fecha_nac']);
         $perfil->setFechaNac($fecha);
+        $perfil->setSexo($data['sexo']);
+        $perfil->setEstado($data['estado']);                
+        
                   
 
         //$em = $this->getDoctrine()->getManager();
