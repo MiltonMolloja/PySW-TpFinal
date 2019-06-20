@@ -57,8 +57,9 @@ class UsuarioController extends AbstractController
         $usuario->setEmail($data['email']);
         $usuario->setTipo($data['tipo']);
         $usuario->setImagen($data['imagen']);
-        $usuario->setEstado($data['estado']);
-        //Se usara el dni del perfil parA obtener el id del perfil 
+        $usuario->setEstado(true); //El Estado sera true
+
+        //Se usara el dni del perfil para obtener el id del perfil 
         //previamente creado
         $perfilArray = $data['perfil'];
         $dniPerfil = $perfilArray['dni'];
@@ -118,9 +119,27 @@ class UsuarioController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="usuario_edit", methods={"GET","POST"})
+     * Request $request, Usuario $usuario
      */
-    public function edit(Request $request, Usuario $usuario): Response
+    public function edit($id, Request $request): Response
     {
+
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository('App:Usuario')->find($id);
+        $usuario->setUsername($data['username']);
+        $usuario->setPassword($data['password']);
+        $usuario->setEmail($data['email']);
+        $usuario->setTipo($data['tipo']);
+        $usuario->setImagen($data['imagen']);
+        //$usuario->setEstado($data['estado']); //El estado no se modifica aqui.
+        
+        //Se guarda la entidad modificada.
+        $em->persist($usuario);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
         /*
         $form = $this->createForm(UsuarioType::class, $usuario);
         $form->handleRequest($request);
@@ -179,5 +198,21 @@ class UsuarioController extends AbstractController
         return new Response(json_encode($result), 200);
     }
 
-
+    /**
+     * @Route("/{id}/borrado", name="usuario_edit", methods={"GET","POST"})
+     *
+     */
+    public function borrado($id, Request $request): Response
+    {
+        //BORRADO LOGICO: Aqui unicamente se cambiara el estado a 0 (Falso)
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository('App:Usuario')->find($id);
+        $usuario->setEstado(false);
+        
+        //Se guarda la entidad modificada.
+        $em->persist($usuario);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
 }
