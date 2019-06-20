@@ -36,12 +36,6 @@ class UsuarioController extends AbstractController
         $response->setContent($serializer->serialize($usuarios, 'json'));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
-
-        /*
-        return $this->render('usuario/index.html.twig', [
-            'usuarios' => $usuarioRepository->findAll(),
-        ]);
-        */
     }
 
     /**
@@ -57,7 +51,7 @@ class UsuarioController extends AbstractController
         $usuario->setEmail($data['email']);
         $usuario->setTipo($data['tipo']);
         $usuario->setImagen($data['imagen']);
-        $usuario->setEstado(true); //El Estado sera true
+        $usuario->setEstado($data['estado']); //El Estado sera true
 
         //Se usara el dni del perfil para obtener el id del perfil 
         //previamente creado
@@ -86,25 +80,6 @@ class UsuarioController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
 
-
-        /*
-        $usuario = new Usuario();
-        $form = $this->createForm(UsuarioType::class, $usuario);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($usuario);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('usuario_index');
-        }
-
-        return $this->render('usuario/new.html.twig', [
-            'usuario' => $usuario,
-            'form' => $form->createView(),
-        ]);
-        */
     }
 
     /**
@@ -140,23 +115,6 @@ class UsuarioController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
 
-        /*
-        $form = $this->createForm(UsuarioType::class, $usuario);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('usuario_index', [
-                'id' => $usuario->getId(),
-            ]);
-        }
-
-        return $this->render('usuario/edit.html.twig', [
-            'usuario' => $usuario,
-            'form' => $form->createView(),
-        ]);
-        */
     }
 
     /**
@@ -199,10 +157,10 @@ class UsuarioController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/borrado", name="usuario_edit", methods={"GET","POST"})
+     * @Route("/{id}/borrado", name="usuario_borrado", methods={"GET","POST"})
      *
      */
-    public function borrado($id, Request $request): Response
+    public function borrado($id): Response
     {
         //BORRADO LOGICO: Aqui unicamente se cambiara el estado a 0 (Falso)
         $em = $this->getDoctrine()->getManager();
