@@ -84,7 +84,7 @@ class EscribanoController extends AbstractController
     /**
      * @Route("/{id}/edit", name="escribano_edit", methods={"GET","POST"})
      */
-    public function edit($id, Escribano $escribano): Response
+    public function edit($id, Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
 

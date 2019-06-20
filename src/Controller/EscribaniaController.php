@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/*AGREGADOs*/
+use Symfony\Component\Serializer\Serializer; 
+use Symfony\Component\Serializer\Encoder\JsonEncoder; 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+/*AGREGADOs*/
 /**
  * @Route("/escribania")
  */
@@ -20,9 +25,17 @@ class EscribaniaController extends AbstractController
      */
     public function index(EscribaniaRepository $escribaniaRepository): Response
     {
-        return $this->render('escribania/index.html.twig', [
-            'escribanias' => $escribaniaRepository->findAll(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $escribanias = $em->getRepository('App:Escribania')->findAll();
+
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $response = new Response();
+        $response->setContent($serializer->serialize($escribanias, 'json'));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response; 
     }
 
     /**
