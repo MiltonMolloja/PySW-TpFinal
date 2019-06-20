@@ -26,9 +26,22 @@ class UsuarioController extends AbstractController
      */
     public function index(UsuarioRepository $usuarioRepository): Response
     {
+        $em = $this->getDoctrine()->getManager();
+        $usuarios = $em->getRepository('App:Usuario')->findAll();
+        $usuarios = array('usuarios' => $usuarios);
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        $response = new Response();
+        $response->setContent($serializer->serialize($usuarios, 'json'));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
+
+        /*
         return $this->render('usuario/index.html.twig', [
             'usuarios' => $usuarioRepository->findAll(),
         ]);
+        */
     }
 
     /**
@@ -36,6 +49,44 @@ class UsuarioController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        //Recuperacion de Atributos
+        $data = json_decode($request->getContent(), true);
+        $usuario = new Usuario();
+        $usuario->setUsername($data['username']);
+        $usuario->setPassword($data['password']);
+        $usuario->setEmail($data['email']);
+        $usuario->setTipo($data['tipo']);
+        $usuario->setImagen($data['imagen']);
+        $usuario->setEstado($data['estado']);
+        //Se usara el dni del perfil parA obtener el id del perfil 
+        //previamente creado
+        $perfilArray = $data['perfil'];
+        $dniPerfil = $perfilArray['dni'];
+        $em = $this->getDoctrine()->getManager();
+        $perfil = $em->getRepository("App:Perfil")->find($dniPerfil);
+        $usuario->setPerfil($perfil);
+
+        //Aqui se pregunta por el tipo de usuario
+        if( $usuario->getTipo() != 'socio' )
+        {
+            $usuario->setEscribano(null);
+        }
+        else
+        {   
+            //Se recupera en base a la matricula
+            $escribanoArray = $data['escribano'];
+            $matriculaEscribano = $escribanoArray['matricula'];
+            $escribano = $em->getRepository("App:Escribano")->find($matriculaEscribano);
+            $usuario->setEscribano($escribano);
+        }
+
+        $em->persist($usuario);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
+
+        /*
         $usuario = new Usuario();
         $form = $this->createForm(UsuarioType::class, $usuario);
         $form->handleRequest($request);
@@ -52,6 +103,7 @@ class UsuarioController extends AbstractController
             'usuario' => $usuario,
             'form' => $form->createView(),
         ]);
+        */
     }
 
     /**
@@ -69,6 +121,7 @@ class UsuarioController extends AbstractController
      */
     public function edit(Request $request, Usuario $usuario): Response
     {
+        /*
         $form = $this->createForm(UsuarioType::class, $usuario);
         $form->handleRequest($request);
 
@@ -84,6 +137,7 @@ class UsuarioController extends AbstractController
             'usuario' => $usuario,
             'form' => $form->createView(),
         ]);
+        */
     }
 
     /**

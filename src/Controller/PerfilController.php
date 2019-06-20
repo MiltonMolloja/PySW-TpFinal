@@ -29,7 +29,25 @@ class PerfilController extends AbstractController
      * @Route("/new", name="perfil_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
-    {
+    {    
+        //Se recupera los atributos
+        $data = json_decode($request->getContent(), true);
+        $perfil = new Perfil();
+        $perfil->setNombres($data['nombres']);
+        $perfil->setApellidos($data['apellidos']);
+        $perfil->setDni($data['dni']);
+        $perfil->setSexo($data['sexo']);
+        $perfil->setEstado($data['estado']);                
+        $fecha = new \DateTime($data['fecha_nac']);
+        $perfil->setFechaNac($fecha);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($perfil);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
+        /*
         $perfil = new Perfil();
         $form = $this->createForm(PerfilType::class, $perfil);
         $form->handleRequest($request);
@@ -46,6 +64,7 @@ class PerfilController extends AbstractController
             'perfil' => $perfil,
             'form' => $form->createView(),
         ]);
+        */
     }
 
     /**
