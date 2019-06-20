@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/*AGREGADOs*/
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+/*AGREGADOs*/
+
 /**
  * @Route("/usuario")
  */
@@ -93,4 +99,31 @@ class UsuarioController extends AbstractController
 
         return $this->redirectToRoute('usuario_index');
     }
+
+    /**
+    * @Route("/login", name="usuario_login", methods={"GET","POST"})
+    */
+    public function login(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        //creamos un usuario
+        $username = $data['username'];
+        $userpassword = $data['password'];
+        //creamos un array criteria con los parametros de busqueda de un usuario en la bd
+        $criteria = array('username' => $username, 'password' => $userpassword);
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository("App:Usuario")->findBy($criteria);
+        if($user != null){
+            $result['status'] = 'ok';
+            $result['username'] = $user[0]->getUsername();
+            $result['tipo'] = $user[0]->getTipo();
+        }else{
+            $result['status'] = 'bad';
+            $result['username'] = '';
+            $result['perfil'] = '';
+        }
+        return new Response(json_encode($result), 200);
+    }
+
+
 }
