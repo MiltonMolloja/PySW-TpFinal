@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/*AGREGADOs*/
+use Symfony\Component\Serializer\Serializer; 
+use Symfony\Component\Serializer\Encoder\JsonEncoder; 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+/*AGREGADOs*/
+
 /**
  * @Route("/perfil")
  */
@@ -20,16 +26,42 @@ class PerfilController extends AbstractController
      */
     public function index(PerfilRepository $perfilRepository): Response
     {
-        return $this->render('perfil/index.html.twig', [
-            'perfils' => $perfilRepository->findAll(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $perfiles = $em->getRepository('App:Perfil')->findAll();
+
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $response = new Response();
+        $response->setContent($serializer->serialize($perfiles, 'json'));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 
     /**
      * @Route("/new", name="perfil_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
-    {
+    {    
+        //Se recupera los atributos
+        $data = json_decode($request->getContent(), true);
+        $perfil = new Perfil();
+        $perfil->setNombres($data['nombres']);
+        $perfil->setApellidos($data['apellidos']);
+        $perfil->setDni($data['dni']);
+        $perfil->setSexo($data['sexo']);
+        $perfil->setEstado($data['estado']);                
+        $fecha = new \DateTime($data['fecha_nac']);
+        $perfil->setFechaNac($fecha);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($perfil);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
+        /*
         $perfil = new Perfil();
         $form = $this->createForm(PerfilType::class, $perfil);
         $form->handleRequest($request);
@@ -46,6 +78,7 @@ class PerfilController extends AbstractController
             'perfil' => $perfil,
             'form' => $form->createView(),
         ]);
+        */
     }
 
     /**
@@ -61,36 +94,43 @@ class PerfilController extends AbstractController
     /**
      * @Route("/{id}/edit", name="perfil_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Perfil $perfil): Response
+    public function edit($id, Request $request): Response
     {
-        $form = $this->createForm(PerfilType::class, $perfil);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+        $em = $this->getDoctrine()->getManager();
+        $perfil = $em->getRepository('App:Perfil')->find($id);
 
-            return $this->redirectToRoute('perfil_index', [
-                'id' => $perfil->getId(),
-            ]);
-        }
+        $perfil->setNombres($data['nombres']);
+        $perfil->setApellidos($data['apellidos']);
+        $perfil->setDni($data['dni']);
+        $perfil->setSexo($data['sexo']);
+        $perfil->setEstado($data['estado']);                
+        $fecha = new \DateTime($data['fecha_nac']);
+        $perfil->setFechaNac($fecha);
+                  
 
-        return $this->render('perfil/edit.html.twig', [
-            'perfil' => $perfil,
-            'form' => $form->createView(),
-        ]);
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($perfil);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
 
     /**
      * @Route("/{id}", name="perfil_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Perfil $perfil): Response
+    public function delete($id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$perfil->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($perfil);
-            $entityManager->flush();
+        $em = $this->getDoctrine()->getManager();
+        $perfil = $em->getRepository('App:Perfil')->find($id);
+        if (!$perfil){
+            throw $this->createNotFoundException('id incorrecta');
         }
-
-        return $this->redirectToRoute('perfil_index');
+        $em->remove($perfil);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
 }
