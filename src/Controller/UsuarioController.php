@@ -121,7 +121,7 @@ class UsuarioController extends AbstractController
      */
     public function edit(Request $request, Usuario $usuario): Response
     {
-        /*
+    
         $form = $this->createForm(UsuarioType::class, $usuario);
         $form->handleRequest($request);
 
@@ -137,7 +137,7 @@ class UsuarioController extends AbstractController
             'usuario' => $usuario,
             'form' => $form->createView(),
         ]);
-        */
+        
     }
 
     /**

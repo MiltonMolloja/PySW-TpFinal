@@ -25,7 +25,12 @@ class EscribanoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $escribano = $em->getRepository('App:Escribano')->findAll();
         $encoders = array(new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer());
+        $normalizers = array((new ObjectNormalizer())->setIgnoredAttributes(
+            [
+            "__initializer__",
+            "__cloner__",
+            "__isInitialized__"
+            ]));
         $serializer = new Serializer($normalizers, $encoders);
         $response = new Response();
         $response->setContent($serializer->serialize($escribano, 'json'));
