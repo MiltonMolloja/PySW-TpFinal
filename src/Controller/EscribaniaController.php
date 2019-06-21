@@ -11,10 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /*AGREGADOs*/
-use Symfony\Component\Serializer\Serializer; 
-use Symfony\Component\Serializer\Encoder\JsonEncoder; 
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 /*AGREGADOs*/
+
 /**
  * @Route("/escribania")
  */
@@ -33,14 +34,32 @@ class EscribaniaController extends AbstractController
         $response = new Response();
         $response->setContent($serializer->serialize($escribanias, 'json'));
         $response->headers->set('Content-Type', 'application/json');
-        return $response; 
+        return $response;
     }
     /**
      * @Route("/new", name="escribania_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
     {
-        $escribanium = new Escribania();
+        $data = json_decode($request->getContent(), true);
+        $escribania = new Escribania();
+        $escribania->setNombre($data['nombre']);
+        $escribania->setDireccion($data['direccion']);
+        $escribania->setTelefono($data['telefono']);
+        $escribania->setEmail($data['email']);
+        $escribania->setFoto($data['foto']);
+        $escribania->setLatitud($data['latitud']);
+        $escribania->setLongitud($data['longitud']);
+        $escribania->setEstado($data['estado']);
+
+        $es = $this->getDoctrine()->getManager();
+        $es->persist($escribania);
+        $es->flush();
+
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
+        /*$escribanium = new Escribania();
         $form = $this->createForm(EscribaniaType::class, $escribanium);
         $form->handleRequest($request);
 
@@ -55,7 +74,7 @@ class EscribaniaController extends AbstractController
         return $this->render('escribania/new.html.twig', [
             'escribanium' => $escribanium,
             'form' => $form->createView(),
-        ]);
+        ]);*/
     }
 
     /**
@@ -71,9 +90,28 @@ class EscribaniaController extends AbstractController
     /**
      * @Route("/{id}/edit", name="escribania_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Escribania $escribanium): Response
+    public function edit($id, Request $request): Response
     {
-        $form = $this->createForm(EscribaniaType::class, $escribanium);
+
+        $data = json_decode($request->getContent(), true);
+        $es = $this->getDoctrine()->getManager();
+        $escribania = $es->getRepository('App:Escribania')->find($id);
+
+        $escribania->setDireccion($data['direccion']);
+        $escribania->setEmail($data['email']);
+        $escribania->setTelefono($data['telefono']);
+        $escribania->setNombre($data['nombre']);
+        $escribania->setLatitud($data['latitud']);
+        $escribania->setLongitud($data['longitud']);
+        $escribania->setFoto($data['foto']);
+        $escribania->setEstado($data['estado']);
+
+        $es->persist($escribania);
+        $es->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+
+        /*$form = $this->createForm(EscribaniaType::class, $escribanium);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -87,20 +125,29 @@ class EscribaniaController extends AbstractController
         return $this->render('escribania/edit.html.twig', [
             'escribanium' => $escribanium,
             'form' => $form->createView(),
-        ]);
+        ]);*/
     }
 
     /**
      * @Route("/{id}", name="escribania_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Escribania $escribanium): Response
+    public function delete($id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$escribanium->getId(), $request->request->get('_token'))) {
+        $es = $this->getDoctrine()->getManager();
+        $escribania = $es->getRepository('App:Escribania')->find($id);
+        if (!$escribania) {
+            throw $this->createNotFoundException('id incorrecta');
+        }
+        $es->remove($escribania);
+        $es->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+        /*if ($this->isCsrfTokenValid('delete'.$escribanium->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($escribanium);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('escribania_index');
+        return $this->redirectToRoute('escribania_index');*/
     }
 }
