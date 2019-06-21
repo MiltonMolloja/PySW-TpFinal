@@ -45,20 +45,19 @@ class UsuarioController extends AbstractController
     {
         //Recuperacion de Atributos
         $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();       
         $usuario = new Usuario();
-        $usuario->setUsername($data['username']);
+        $usuario->setUsername($data['username']);  
         $usuario->setPassword($data['password']);
         $usuario->setEmail($data['email']);
         $usuario->setTipo($data['tipo']);
-        $usuario->setImagen($data['imagen']);
-        $usuario->setEstado($data['estado']); //El Estado sera true
+        $usuario->setImagen($data['imagen']); 
+        $usuario->setEstado($data['estado']); 
 
         //Se usara el dni del perfil para obtener el id del perfil 
         //previamente creado
         $perfilArray = $data['perfil'];
-        $dniPerfil = $perfilArray['dni'];
-        $em = $this->getDoctrine()->getManager();
-        $perfil = $em->getRepository("App:Perfil")->find($dniPerfil);
+        $perfil = $em->getRepository("App:Perfil")->find($perfilArray);
         $usuario->setPerfil($perfil);
 
         //Aqui se pregunta por el tipo de usuario
