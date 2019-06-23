@@ -43,34 +43,32 @@ class UsuarioController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        //Recuperacion de Atributos
-        $data = json_decode($request->getContent(), true);
-        $em = $this->getDoctrine()->getManager();       
-        $usuario = new Usuario();
-        $usuario->setUsername($data['username']);  
-        $usuario->setPassword($data['password']);
-        $usuario->setEmail($data['email']);
-        $usuario->setTipo($data['tipo']);
-        $usuario->setImagen($data['imagen']); 
-        $usuario->setEstado($data['estado']); 
+         //Recuperacion de Atributos
+         $data = json_decode($request->getContent(), true);
+         $em = $this->getDoctrine()->getManager();       
+         $usuario = new Usuario();
+         $usuario->setEstado($data['estado']); //Cuando intenta recuperar el estado con data no puede pero si pasas true pasa al siguiente 
+         $usuario->setUsername($data['username']);  
+         $usuario->setPassword($data['password']);
+         $usuario->setEmail($data['email']);
+         $usuario->setTipo($data['tipo']);
+         $usuario->setImagen($data['imagen']); 
 
-        //Se usara el dni del perfil para obtener el id del perfil 
-        //previamente creado
-        $perfilArray = $data['perfil'];
-        $perfil = $em->getRepository("App:Perfil")->find($perfilArray);
+        //Confecciono una entidad Perfil
+        $perfilArray= $data['perfil'];
+        $idPerfil = $perfilArray['id'];        
+        $perfil = $em->getRepository("App:Perfil")->find($idPerfil);
         $usuario->setPerfil($perfil);
 
-        //Aqui se pregunta por el tipo de usuario
         if( $usuario->getTipo() != 'socio' )
         {
             $usuario->setEscribano(null);
-        }
+        } 
         else
-        {   
-            //Se recupera en base a la matricula
-            $escribanoArray = $data['escribano'];
-            $matriculaEscribano = $escribanoArray['matricula'];
-            $escribano = $em->getRepository("App:Escribano")->find($matriculaEscribano);
+        {
+            $escribanoArray= $data['escribano'];
+            $idEscribano = $escribanoArray['id'];        
+            $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
             $usuario->setEscribano($escribano);
         }
 

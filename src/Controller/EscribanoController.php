@@ -23,12 +23,13 @@ class EscribanoController extends AbstractController
     public function index(EscribanoRepository $escribanoRepository): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $escribano = $em->getRepository('App:Escribano')->findAll();
+        $escribanos = $em->getRepository('App:Escribano')->findAll();
+        $escribanos = array('escribanos' => $escribanos );
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
         $response = new Response();
-        $response->setContent($serializer->serialize($escribano, 'json'));
+        $response->setContent($serializer->serialize($escribanos, 'json'));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
@@ -113,4 +114,23 @@ class EscribanoController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }    
+
+    /**
+     * @Route("/{id}/borrado", name="escribano_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository('App:Escribano')->find($id);
+        $escribano->setEstado(false);                
+                  
+
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($escribano);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
+
 }

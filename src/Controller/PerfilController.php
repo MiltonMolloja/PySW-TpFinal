@@ -28,7 +28,7 @@ class PerfilController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $perfiles = $em->getRepository('App:Perfil')->findAll();
-        $perfiles = array('usuarios' => $perfiles);
+        $perfiles = array('perfiles' => $perfiles);
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -84,14 +84,13 @@ class PerfilController extends AbstractController
         $perfil->setNombres($data['nombres']);
         $perfil->setApellidos($data['apellidos']);
         $perfil->setDni($data['dni']);
-        $perfil->setSexo($data['sexo']);
-        //$perfil->setEstado($data['estado']); //El estado no se modificaria aqui                
+        $perfil->setSexo($data['sexo']);                
         $fecha = new \DateTime($data['fecha_nac']);
         $perfil->setFechaNac($fecha);
                   
 
         //$em = $this->getDoctrine()->getManager();
-        //guardo en la BD la entidad mensaje modificada.
+        //guardo en la BD
         $em->persist($perfil);
         $em->flush();
         $result['status'] = 'ok';

@@ -27,6 +27,7 @@ class EscribaniaController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $escribanias = $em->getRepository('App:Escribania')->findAll();
+        $escribanias = array('escribanias' => $escribanias );
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
