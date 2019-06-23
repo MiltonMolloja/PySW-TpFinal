@@ -105,7 +105,22 @@ class UsuarioController extends AbstractController
         $usuario->setTipo($data['tipo']);
         $usuario->setImagen($data['imagen']);
         //$usuario->setEstado($data['estado']); //El estado no se modifica aqui.
+       
+        //El perfil sigue teniendo el mismo id y los datos ya se modificaron antes.
         
+        //Lo que importa es el tipo de escribano
+        if( $data['escribano'] == null )
+        {
+            $usuario->setEscribano(null);
+        }
+        else
+        {
+            $escribanoArray= $data['escribano'];
+            $idEscribano = $escribanoArray['id'];        
+            $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
+            $usuario->setEscribano($escribano);
+        }
+
         //Se guarda la entidad modificada.
         $em->persist($usuario);
         $em->flush();

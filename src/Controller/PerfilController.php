@@ -87,7 +87,7 @@ class PerfilController extends AbstractController
         $perfil->setSexo($data['sexo']);                
         $fecha = new \DateTime($data['fecha_nac']);
         $perfil->setFechaNac($fecha);
-                  
+        //El estado no es necesario cambiarlos aqui.          
 
         //$em = $this->getDoctrine()->getManager();
         //guardo en la BD
