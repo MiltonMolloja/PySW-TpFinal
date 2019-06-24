@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/*AGREGADOs*/
+use Symfony\Component\Serializer\Serializer; 
+use Symfony\Component\Serializer\Encoder\JsonEncoder; 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+/*AGREGADOs*/
+
 /**
  * @Route("/pago")
  */
@@ -20,9 +26,17 @@ class PagoController extends AbstractController
      */
     public function index(PagoRepository $pagoRepository): Response
     {
-        return $this->render('pago/index.html.twig', [
-            'pagos' => $pagoRepository->findAll(),
-        ]);
+        $em = $this->getDoctrine()->getManager();
+        $pagos = $em->getRepository('App:Pago')->findAll();
+
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $response = new Response();
+        $response->setContent($serializer->serialize($pagos, 'json'));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 
     /**
