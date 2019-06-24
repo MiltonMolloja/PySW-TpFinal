@@ -51,7 +51,7 @@ class PerfilController extends AbstractController
         $perfil->setDni($data['dni']);
         $perfil->setSexo($data['sexo']);
         $perfil->setEstado($data['estado']);                
-        $fecha = new \DateTime($data['fecha_nac']);
+        $fecha = new \DateTime($data['fechaNac']);
         $perfil->setFechaNac($fecha);
 
         $em = $this->getDoctrine()->getManager();
@@ -85,7 +85,7 @@ class PerfilController extends AbstractController
         $perfil->setApellidos($data['apellidos']);
         $perfil->setDni($data['dni']);
         $perfil->setSexo($data['sexo']);                
-        $fecha = new \DateTime($data['fecha_nac']);
+        $fecha = new \DateTime($data['fechaNac']);
         $perfil->setFechaNac($fecha);
         //El estado no es necesario cambiarlos aqui.          
 
