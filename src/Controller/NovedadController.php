@@ -164,4 +164,22 @@ class NovedadController extends AbstractController
 
         return $this->redirectToRoute('novedad_index');*/
     }
+
+    /**
+     * @Route("/{id}/borrado", name="escribano_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $novedad = $em->getRepository('App:Novedad')->find($id);
+        $novedad->setEstado(false);                
+                  
+
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($novedad);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
 }
