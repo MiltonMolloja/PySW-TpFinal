@@ -150,4 +150,22 @@ class EscribaniaController extends AbstractController
 
         return $this->redirectToRoute('escribania_index');*/
     }
+
+    /**
+     * @Route("/{id}/borrado", name="escribano_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $escribania = $em->getRepository('App:Escribania')->find($id);
+        $escribania->setEstado(false);                
+                  
+
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($escribania);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
 }
