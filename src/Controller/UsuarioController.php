@@ -28,7 +28,7 @@ class UsuarioController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $usuarios = $em->getRepository('App:Usuario')->findAll();
-        $usuarios = array('usuarios' => $usuarios);
+        //$usuarios = array('usuarios' => $usuarios);
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -36,6 +36,8 @@ class UsuarioController extends AbstractController
         $response->setContent($serializer->serialize($usuarios, 'json'));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
+
+        
 
         /*
         return $this->render('usuario/index.html.twig', [
