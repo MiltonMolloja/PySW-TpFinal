@@ -82,7 +82,7 @@ class EscribanoController extends AbstractController
         $escribano = $em->getRepository('App:Escribano')->find($id);
         $escribano->setMatricula($data['matricula']);        
         $escribano->setUniversidad($data['universidad']);
-        $escribano->setEstado($data['estado']);
+        //$escribano->setEstado($data['estado']); //Estado no es necesario modificarlo
         
         //recupero la entidad empresa de la BD que se corresponde con la id
         //que se recibe en formato JSON y le asigno a la propiedad empresa de mensaje.
@@ -98,6 +98,7 @@ class EscribanoController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }
+
     /**
      * @Route("/{id}", name="escribano_delete", methods={"DELETE"})
      */
@@ -112,5 +113,25 @@ class EscribanoController extends AbstractController
         $em->flush();
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
-    }    
+    }   
+    
+
+    /**
+     * @Route("/{id}/borrado", name="escribano_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository('App:Escribano')->find($id);
+        $escribano->setEstado(false);                
+                  
+
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($escribano);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
+    
 }

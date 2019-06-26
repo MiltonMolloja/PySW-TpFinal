@@ -28,11 +28,10 @@ class PerfilController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $perfiles = $em->getRepository('App:Perfil')->findAll();
-
+        //$perfiles = array('perfiles' => $perfiles);
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
-
         $response = new Response();
         $response->setContent($serializer->serialize($perfiles, 'json'));
         $response->headers->set('Content-Type', 'application/json');
@@ -50,36 +49,16 @@ class PerfilController extends AbstractController
         $perfil->setNombres($data['nombres']);
         $perfil->setApellidos($data['apellidos']);
         $perfil->setDni($data['dni']);
-        $fecha = new \DateTime($data['fecha_Nac']);
-        $perfil->setFechaNac($fecha);
         $perfil->setSexo($data['sexo']);
         $perfil->setEstado($data['estado']);                
-        
+        $fecha = new \DateTime($data['fechaNac']);
+        $perfil->setFechaNac($fecha);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($perfil);
         $em->flush();
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
-
-        /*
-        $perfil = new Perfil();
-        $form = $this->createForm(PerfilType::class, $perfil);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($perfil);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('perfil_index');
-        }
-
-        return $this->render('perfil/new.html.twig', [
-            'perfil' => $perfil,
-            'form' => $form->createView(),
-        ]);
-        */
     }
 
     /**
@@ -97,7 +76,7 @@ class PerfilController extends AbstractController
      */
     public function edit($id, Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
+		$data = json_decode($request->getContent(), true);
 
         $em = $this->getDoctrine()->getManager();
         $perfil = $em->getRepository('App:Perfil')->find($id);
@@ -105,15 +84,13 @@ class PerfilController extends AbstractController
         $perfil->setNombres($data['nombres']);
         $perfil->setApellidos($data['apellidos']);
         $perfil->setDni($data['dni']);
-        $fecha = new \DateTime($data['fecha_Nac']);
+        $perfil->setSexo($data['sexo']);                
+        $fecha = new \DateTime($data['fechaNac']);
         $perfil->setFechaNac($fecha);
-        $perfil->setSexo($data['sexo']);
-        $perfil->setEstado($data['estado']);                       
-        
-                  
+        //El estado no es necesario cambiarlos aqui.          
 
         //$em = $this->getDoctrine()->getManager();
-        //guardo en la BD la entidad mensaje modificada.
+        //guardo en la BD
         $em->persist($perfil);
         $em->flush();
         $result['status'] = 'ok';
@@ -135,4 +112,23 @@ class PerfilController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }
+
+    /**
+     * @Route("/{id}/borrado", name="perfil_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $perfil = $em->getRepository('App:Perfil')->find($id);
+        $perfil->setEstado(false);                
+                  
+
+        //$em = $this->getDoctrine()->getManager();
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($perfil);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
+    }
+
 }
