@@ -97,7 +97,7 @@ class PagoController extends AbstractController
         $idEscribano = $escribanoArray['id'];
         //$em = $this->getDoctrine()->getManager();
         $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
-        $pago->setEscribano($Escribano);
+        $pago->setEscribano($escribano);
         
         //guardo en la BD la entidad mensaje modificada.
         $em->persist($pago);
