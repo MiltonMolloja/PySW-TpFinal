@@ -92,7 +92,7 @@ class UsuarioController extends AbstractController
     /**
      * @Route("/{id}/edit", name="usuario_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Usuario $usuario): Response
+    public function edit($id, Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
         $em = $this->getDoctrine()->getManager();
