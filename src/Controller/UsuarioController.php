@@ -36,14 +36,6 @@ class UsuarioController extends AbstractController
         $response->setContent($serializer->serialize($usuarios, 'json'));
         $response->headers->set('Content-Type', 'application/json');
         return $response;
-
-        
-
-        /*
-        return $this->render('usuario/index.html.twig', [
-            'usuarios' => $usuarioRepository->findAll(),
-        ]);
-        */
     }
 
     /**
@@ -51,34 +43,32 @@ class UsuarioController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        //Recuperacion de Atributos
-        $data = json_decode($request->getContent(), true);
-        $usuario = new Usuario();
-        $usuario->setUsername($data['username']);
-        $usuario->setPassword($data['password']);
-        $usuario->setEmail($data['email']);
-        $usuario->setTipo($data['tipo']);
-        $usuario->setImagen($data['imagen']);
-        $usuario->setEstado($data['estado']);
-        //Se usara el dni del perfil parA obtener el id del perfil 
-        //previamente creado
-        $perfilArray = $data['perfil'];
-        $dniPerfil = $perfilArray['dni'];
-        $em = $this->getDoctrine()->getManager();
-        $perfil = $em->getRepository("App:Perfil")->find($dniPerfil);
+         //Recuperacion de Atributos
+         $data = json_decode($request->getContent(), true);
+         $em = $this->getDoctrine()->getManager();       
+         $usuario = new Usuario();
+         $usuario->setEstado($data['estado']); //Cuando intenta recuperar el estado con data no puede pero si pasas true pasa al siguiente 
+         $usuario->setUsername($data['username']);  
+         $usuario->setPassword($data['password']);
+         $usuario->setEmail($data['email']);
+         $usuario->setTipo($data['tipo']);
+         $usuario->setImagen($data['imagen']); 
+
+        //Confecciono una entidad Perfil
+        $perfilArray= $data['perfil'];
+        $idPerfil = $perfilArray['id'];        
+        $perfil = $em->getRepository("App:Perfil")->find($idPerfil);
         $usuario->setPerfil($perfil);
 
-        //Aqui se pregunta por el tipo de usuario
-        if( $usuario->getTipo() != 'socio' )
+        if( $usuario->getTipo() != 'Socio' )
         {
             $usuario->setEscribano(null);
-        }
+        } 
         else
-        {   
-            //Se recupera en base a la matricula
-            $escribanoArray = $data['escribano'];
-            $matriculaEscribano = $escribanoArray['matricula'];
-            $escribano = $em->getRepository("App:Escribano")->find($matriculaEscribano);
+        {
+            $escribanoArray= $data['escribano'];
+            $idEscribano = $escribanoArray['id'];        
+            $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
             $usuario->setEscribano($escribano);
         }
 
@@ -87,25 +77,6 @@ class UsuarioController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
 
-
-        /*
-        $usuario = new Usuario();
-        $form = $this->createForm(UsuarioType::class, $usuario);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($usuario);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('usuario_index');
-        }
-
-        return $this->render('usuario/new.html.twig', [
-            'usuario' => $usuario,
-            'form' => $form->createView(),
-        ]);
-        */
     }
 
     /**
@@ -123,23 +94,36 @@ class UsuarioController extends AbstractController
      */
     public function edit(Request $request, Usuario $usuario): Response
     {
-    
-        $form = $this->createForm(UsuarioType::class, $usuario);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('usuario_index', [
-                'id' => $usuario->getId(),
-            ]);
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository('App:Usuario')->find($id);
+        $usuario->setUsername($data['username']);
+        $usuario->setPassword($data['password']);
+        $usuario->setEmail($data['email']);
+        $usuario->setTipo($data['tipo']);
+        $usuario->setImagen($data['imagen']);
+        //$usuario->setEstado($data['estado']); //El estado no se modifica aqui.
+       
+        //El perfil sigue teniendo el mismo id y los datos ya se modificaron antes.
+        
+        //Lo que importa es el tipo de escribano
+        if( $data['escribano'] == null )
+        {
+            $usuario->setEscribano(null);
+        }
+        else
+        {
+            $escribanoArray= $data['escribano'];
+            $idEscribano = $escribanoArray['id'];        
+            $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
+            $usuario->setEscribano($escribano);
         }
 
-        return $this->render('usuario/edit.html.twig', [
-            'usuario' => $usuario,
-            'form' => $form->createView(),
-        ]);
-        
+        //Se guarda la entidad modificada.
+        $em->persist($usuario);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
 
     /**
@@ -178,6 +162,23 @@ class UsuarioController extends AbstractController
             $result['username'] = '';
             $result['perfil'] = '';
         }
+        return new Response(json_encode($result), 200);
+    }
+
+    /**
+     * @Route("/{id}/borrado", name="usuario_borrado", methods={"GET","POST"})
+     */
+    public function borrado($id): Response
+    {
+        //BORRADO LOGICO: Aqui unicamente se cambiara el estado a 0 (Falso)
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository('App:Usuario')->find($id);
+        $usuario->setEstado(false);
+        
+        //Se guarda la entidad modificada.
+        $em->persist($usuario);
+        $em->flush();
+        $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }
 
