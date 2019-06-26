@@ -44,22 +44,28 @@ class PagoController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $pago = new Pago();
-        $form = $this->createForm(PagoType::class, $pago);
-        $form->handleRequest($request);
+       //recupero atributos
+       $data = json_decode($request->getContent(), true);
+       $pago = new Pago();
+       $pago->setImporte($data['importe']);        
+       $pago->setEstado($data['estado']);
+       $fecha = new \DateTime($data['fecha']);
+       $pago->setFecha($fecha);
+       
+       //Se Modifico El controlador para el Alta de Entidad Moneda  Sin Cliente
+       //$em = $this->getDoctrine()->getManager();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($pago);
-            $entityManager->flush();
+       $escribanoArray= $data['escribano'];
+       $idEscribano = $escribanoArray['id'];
+       $em = $this->getDoctrine()->getManager();
+       $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
+       $pago->setEscribano($escribano);
 
-            return $this->redirectToRoute('pago_index');
-        }
+       $em->persist($pago);
+       $em->flush();
 
-        return $this->render('pago/new.html.twig', [
-            'pago' => $pago,
-            'form' => $form->createView(),
-        ]);
+       $result['status'] = 'ok';
+       return new Response(json_encode($result), 200);
     }
 
     /**
@@ -75,36 +81,44 @@ class PagoController extends AbstractController
     /**
      * @Route("/{id}/edit", name="pago_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Pago $pago): Response
+    public function edit($id, Request $request): Response
     {
-        $form = $this->createForm(PagoType::class, $pago);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('pago_index', [
-                'id' => $pago->getId(),
-            ]);
-        }
-
-        return $this->render('pago/edit.html.twig', [
-            'pago' => $pago,
-            'form' => $form->createView(),
-        ]);
+        $data = json_decode($request->getContent(), true);
+        $em = $this->getDoctrine()->getManager();
+        $pago = $em->getRepository('App:Pago')->find($id);
+        $pago->setImporte($data['importe']);        
+        $pago->setEstado($data['estado']);
+        $fecha = new \DateTime($data['fecha']);
+        $pago->setFecha($fecha);
+        
+        //recupero la entidad empresa de la BD que se corresponde con la id
+        //que se recibe en formato JSON y le asigno a la propiedad empresa de mensaje.
+        $escribanoArray= $data['escribano'];
+        $idEscribano = $escribanoArray['id'];
+        //$em = $this->getDoctrine()->getManager();
+        $escribano = $em->getRepository("App:Escribano")->find($idEscribano);
+        $pago->setEscribano($Escribano);
+        
+        //guardo en la BD la entidad mensaje modificada.
+        $em->persist($pago);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
 
     /**
      * @Route("/{id}", name="pago_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Pago $pago): Response
+    public function delete($id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$pago->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($pago);
-            $entityManager->flush();
+        $em = $this->getDoctrine()->getManager();
+        $pago = $em->getRepository('App:Pago')->find($id);
+        if (!$pago){
+            throw $this->createNotFoundException('id incorrecta');
         }
-
-        return $this->redirectToRoute('pago_index');
+        $em->remove($pago);
+        $em->flush();
+        $result['status'] = 'ok';
+        return new Response(json_encode($result), 200);
     }
 }
