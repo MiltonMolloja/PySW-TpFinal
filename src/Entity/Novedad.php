@@ -32,7 +32,7 @@ class Novedad
     private $mensaje;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Escribano", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Escribano", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $escribano;
