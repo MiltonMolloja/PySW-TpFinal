@@ -114,24 +114,24 @@ class EscribanoController extends AbstractController
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }   
-    
 
     /**
-     * @Route("/{id}/borrado", name="escribano_borrado", methods={"GET","POST"})
+     * @Route("/{id}/borrar", name="escribano_borrar", methods={"GET","POST"})
      */
-    public function borrado($id): Response
+    public function borrar($id): Response
     {
         $em = $this->getDoctrine()->getManager();
         $escribano = $em->getRepository('App:Escribano')->find($id);
-        $escribano->setEstado(false);                
-                  
+        $escribano->setEstado(false);        
 
-        //$em = $this->getDoctrine()->getManager();
+        
         //guardo en la BD la entidad mensaje modificada.
         $em->persist($escribano);
         $em->flush();
         $result['status'] = 'ok';
         return new Response(json_encode($result), 200);
     }
-    
+
+
+
 }
