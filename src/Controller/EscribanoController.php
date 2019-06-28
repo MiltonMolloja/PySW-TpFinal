@@ -82,6 +82,7 @@ class EscribanoController extends AbstractController
         $escribano = $em->getRepository('App:Escribano')->find($id);
         $escribano->setMatricula($data['matricula']);        
         $escribano->setUniversidad($data['universidad']);
+        $escribano->setEstado($data['estado']);        
         //$escribano->setEstado($data['estado']); //Estado no es necesario modificarlo
         
         //recupero la entidad empresa de la BD que se corresponde con la id
