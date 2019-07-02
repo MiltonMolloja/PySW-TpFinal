@@ -157,6 +157,7 @@ class UsuarioController extends AbstractController
             $result['status'] = 'ok';
             $result['username'] = $user[0]->getUsername();
             $result['tipo'] = $user[0]->getTipo();
+            $result['imagen'] = $user[0]->getImagen();
         }else{
             $result['status'] = 'bad';
             $result['username'] = '';
