@@ -10,7 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 /*AGREGADOs*/
 use Symfony\Component\Serializer\Serializer; 
 use Symfony\Component\Serializer\Encoder\JsonEncoder; 
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer; 
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use phpDocumentor\Reflection\Types\Boolean;
+
 /*AGREGADOs*/
 /**
  * @Route("/escribano")
@@ -133,6 +135,50 @@ class EscribanoController extends AbstractController
         return new Response(json_encode($result), 200);
     }
 
-
+    /**
+     * @Route("/validacionMatricula", name="escribano_matricula", methods={"GET","POST"})
+     */
+    public function validarMatricula( Request $request ): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $arrayIdMatricuala = json_decode($request->getContent(), true); //Se recibe el id en la posiccion 0 y matricula en la 1
+        //Para la creaccion
+        //Pregunta si la matricula es -1
+        if( $arrayIdMatricuala[0] == '-1'  )
+        {
+            //Se esta creando recian
+            $escribano = $em->getRepository('App:Escribano')->findBy(['matricula' => $arrayIdMatricuala[1] ]); //Se usa el findBy para encontrar la matricula
+            if( $escribano == null )
+            {
+            $result = false;  //$result = 'no';
+            }
+            else
+            { 
+            $result = true; //$result = 'si';
+            }
+        }
+        else
+        {
+            //Para la modificacion.
+            $escribano = $em->getRepository('App:Escribano')->findBy(['matricula' => $arrayIdMatricuala[1] ]); //Se usa el findBy para encontrar la matricula
+            //Si es igual a nulo se trata de una matricula que no esta registrada
+            if( $escribano == null )
+            {
+                $result = false; //$result = 'Noo';
+            }
+            else
+            {
+                if( $escribano[0]->getId() == $arrayIdMatricuala[0] )
+                {
+                    $result = false; //$result = 'No';// Se repito sòlo para ese escribano
+                }
+                else
+                {
+                    $result = true;   //$result = 'Si';// Se repito para ese otro escribano
+                }
+            }
+        }
+        return new Response(json_encode($result), 200);
+    }///
 
 }
