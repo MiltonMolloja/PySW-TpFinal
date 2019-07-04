@@ -143,8 +143,8 @@ class PerfilController extends AbstractController
         if( $arrayIdDni[0] == '-1'  )
         {
             //Se esta creando recian
-            $escribano = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
-            if( $escribano == null )
+            $perfil = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
+            if( $perfil == null )
             {
                 $result = false;  //No se encontro
             }
@@ -156,15 +156,15 @@ class PerfilController extends AbstractController
         else
         {
             //Para la modificacion.
-            $escribano = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
+            $perfil = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
             //Si es igual a nulo se trata de un dni no registrado
-            if( $escribano == null )
+            if( $perfil == null )
             {
                 $result = false; //No se encontro
             }
             else
             {
-                if( $escribano[0]->getId() == $arrayIdDni[0] )
+                if( $perfil[0]->getId() == $arrayIdDni[0] )
                 {
                     $result = false; // Sòlo se repite para ese perfil
                 }

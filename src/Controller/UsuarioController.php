@@ -183,5 +183,97 @@ class UsuarioController extends AbstractController
         return new Response(json_encode($result), 200);
     }
 
+    /**
+     * @Route("/validacionUsername", name="usuario_username", methods={"GET","POST"})
+     */
+    public function validarUsername(Request $request): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $arrayIdUsername = json_decode($request->getContent(), true); //Se recibe el id en la posiccion 0 y el Username en la 1
+        //Para la creaccion
+        //Pregunta si el id es -1       
+        if( $arrayIdUsername[0] == '-1'  )
+        {
+            //Se esta creando recian
+            $usuario = $em->getRepository('App:Usuario')->findBy(['username' => $arrayIdUsername[1] ]); //Se usa el findBy para encontrar el username
+            if( $usuario == null )
+            {
+                $result = false;  //No se encontro
+            }
+            else
+            { 
+                $result = true; //Se encontro
+            }
+        }
+        else
+        {
+            //Para la modificacion.
+            $usuario = $em->getRepository('App:Usuario')->findBy(['username' => $arrayIdUsername[1] ]); //Se usa el findBy para encontrar el username
+            //Si es igual a nulo se trata de un username no registrado
+            if( $usuario == null )
+            {
+                $result = false; //No se encontro
+            }
+            else
+            {
+                if( $usuario[0]->getId() == $arrayIdUsername[0] )
+                {
+                    $result = false; // Sòlo se repite para este usuario
+                }
+                else
+                {
+                    $result = true;  // Se repito para otro usuario
+                }
+            }
+        }
+        return new Response(json_encode($result), 200);
+    }
+
+    /**
+     * @Route("/validacionCorreo", name="usuario_correo", methods={"GET","POST"})
+     */
+    public function validarCorreo(Request $request): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $arrayIdCorreo = json_decode($request->getContent(), true); //Se recibe el id en la posiccion 0 y el correo en la 1
+        //Para la creaccion
+        //Pregunta si el id es -1       
+        if( $arrayIdCorreo[0] == '-1'  )
+        {
+            //Se esta creando recian
+            $usuario = $em->getRepository('App:Usuario')->findBy(['email' => $arrayIdCorreo[1] ]); //Se usa el findBy para encontrar el correo
+            if( $usuario == null )
+            {
+                $result = false;  //No se encontro
+            }
+            else
+            { 
+                $result = true; //Se encontro
+            }
+        }
+        else
+        {
+            //Para la modificacion.
+            $usuario = $em->getRepository('App:Usuario')->findBy(['email' => $arrayIdCorreo[1] ]); //Se usa el findBy para encontrar el correo
+            //Si es igual a nulo se trata de un email no registrado
+            if( $usuario == null )
+            {
+                $result = false; //No se encontro
+            }
+            else
+            {
+                if( $usuario[0]->getId() == $arrayIdCorreo[0] )
+                {
+                    $result = false; // Sòlo se repite para este usuario
+                }
+                else
+                {
+                    $result = true;  // Se repito para otro usuario
+                }
+            }
+        }
+        return new Response(json_encode($result), 200);
+    }
 
 }
+
