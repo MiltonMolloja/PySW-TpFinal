@@ -143,7 +143,7 @@ class EscribanoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $arrayIdMatricuala = json_decode($request->getContent(), true); //Se recibe el id en la posiccion 0 y matricula en la 1
         //Para la creaccion
-        //Pregunta si la matricula es -1
+        //Pregunta si el id es -1
         if( $arrayIdMatricuala[0] == '-1'  )
         {
             //Se esta creando recian

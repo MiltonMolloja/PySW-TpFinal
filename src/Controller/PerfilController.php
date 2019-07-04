@@ -131,4 +131,50 @@ class PerfilController extends AbstractController
         return new Response(json_encode($result), 200);
     }
 
+    /**
+     * @Route("/validacionDocumento", name="perfil_documento", methods={"GET","POST"})
+     */
+    public function validarDNI(Request $request):Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $arrayIdDni = json_decode($request->getContent(), true); //Se recibe el id en la posiccion 0 y el DNI en la 1
+        //Para la creaccion
+        //Pregunta si el id es -1       
+        if( $arrayIdDni[0] == '-1'  )
+        {
+            //Se esta creando recian
+            $escribano = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
+            if( $escribano == null )
+            {
+                $result = false;  //No se encontro
+            }
+            else
+            { 
+                $result = true; //Se encontro
+            }
+        }
+        else
+        {
+            //Para la modificacion.
+            $escribano = $em->getRepository('App:Perfil')->findBy(['dni' => $arrayIdDni[1] ]); //Se usa el findBy para encontrar el dni
+            //Si es igual a nulo se trata de un dni no registrado
+            if( $escribano == null )
+            {
+                $result = false; //No se encontro
+            }
+            else
+            {
+                if( $escribano[0]->getId() == $arrayIdDni[0] )
+                {
+                    $result = false; // Sòlo se repite para ese perfil
+                }
+                else
+                {
+                    $result = true;  // Se repito para otro perfil
+                }
+            }
+        }
+        return new Response(json_encode($result), 200);
+    }
+
 }
