@@ -102,7 +102,7 @@ class UsuarioController extends AbstractController
         $usuario->setEmail($data['email']);
         $usuario->setTipo($data['tipo']);
         $usuario->setImagen($data['imagen']);
-        //$usuario->setEstado($data['estado']); //El estado no se modifica aqui.
+        $usuario->setEstado($data['estado']); //El estado no se modifica aqui.
        
         //El perfil sigue teniendo el mismo id y los datos ya se modificaron antes.
         
@@ -154,10 +154,16 @@ class UsuarioController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository("App:Usuario")->findBy($criteria);
         if($user != null){
+            if ($user[0]->getEstado()==true){
             $result['status'] = 'ok';
             $result['username'] = $user[0]->getUsername();
             $result['tipo'] = $user[0]->getTipo();
             $result['imagen'] = $user[0]->getImagen();
+            }else{
+                $result['status'] = 'bad';
+                $result['username'] = '';
+                $result['perfil'] = '';
+            }
         }else{
             $result['status'] = 'bad';
             $result['username'] = '';
